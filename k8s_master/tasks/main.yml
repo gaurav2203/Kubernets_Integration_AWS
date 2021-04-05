@@ -1,0 +1,72 @@
+---
+# tasks file for k8s_master
+
+- name: "Installing docker"
+  package:
+     name: docker
+     state: present
+- name: "Starting docker..."
+  service:
+     name: docker
+     state: started
+     enabled: true
+- name: "Configuring yum for kubeadm"
+  yum_repository:
+     name: Kubernetes
+     description: Repo for kubeadm
+     baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+     gpgcheck: 1
+     gpgkey: 
+       -  "https://packages.cloud.google.com/yum/doc/yum-key.gpg"
+       -  "https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+- name: "Installing kubectl, kubelet, kubeadm"
+  yum:
+     name: "{{ item }}"
+     disable_excludes: kubernetes
+     state: present
+  loop:
+  - kubectl
+  - kubeadm
+  - kubelet
+- name: "Enableing kubelet"
+  service:
+     name: kubelet
+     state: started
+     enabled: true
+- name: "Pulling all the required images"
+  shell:
+     cmd: "kubeadm config images pull"
+- file:
+     path: /etc/docker/daemon.js
+     state: touch
+- name: "Changing docker config"
+  blockinfile:
+     path: /etc/docker/daemon.js
+     block: |
+          {
+          "exec-opts":["native.cgroupdriver=systemd"]
+          }
+     state: present
+- name: "restarting docker"
+  service: 
+     name: docker
+     state: restarted
+- name: "Installing iproute-tc"
+  package:
+     name: iproute-tc
+     state: present
+- lineinfile:
+     path: /proc/sys/net/bridge/bridge-nf-call-iptables
+     line: "1"
+     state: present
+- name: "initializing"
+  shell:
+     cmd: "{{ item.command }}"
+  loop:
+  - { command: "kubeadm init --pod-network-cidr=10.240.0.0/16 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem" }
+  - { command: "mkdir -p $HOME/.kube" }
+  - { command: "sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config" }
+  - { command: "sudo chown $(id -u):$(id -g) $HOME/.kube/config" }
+  - { command: "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml" }
+
+  

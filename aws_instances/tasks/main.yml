@@ -1,0 +1,74 @@
+---
+# tasks file for aws_instances
+
+- name: "Creating Master instance"
+  ec2:
+    key_name: "awsKey"
+    instance_type: "t2.micro"
+    image: "ami-0742b4e673072066f"
+    wait: yes
+    count: 1
+    instance_tags:
+      Name: k8s_master
+    vpc_subnet_id: "subnet-7308a02c"
+    assign_public_ip: yes
+    region: "us-east-1"
+    state: present
+    group_id: "sg-02f9283bb66f4a8a9"
+    aws_access_key: "AKIAWGOYPXXXDPTOZSIJ"
+    aws_secret_key: "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"
+  register: master
+- debug:
+    var: master.instances[0].public_ip
+
+- name: "Creating Worker1"
+  ec2:
+    key_name: "awsKey"
+    instance_type: "t2.micro"
+    image: "ami-0742b4e673072066f"
+    wait: yes
+    count: 1
+    instance_tags:
+      Name: k8s_worker1
+    vpc_subnet_id: "subnet-7308a02c"
+    assign_public_ip: yes
+    region: "us-east-1"
+    state: present
+    group_id: "sg-02f9283bb66f4a8a9"
+    aws_access_key: "AKIAWGOYPXXXDPTOZSIJ"
+    aws_secret_key: "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"
+  register: worker1
+- debug:
+    var: worker1.instances[0].public_ip
+
+- name: "Creating Worker2"
+  ec2:
+    key_name: "awsKey"
+    instance_type: "t2.micro"
+    image: "ami-0742b4e673072066f"
+    wait: yes
+    count: 1
+    instance_tags:
+      Name: aws_ansible_ec2
+    vpc_subnet_id: "subnet-7308a02c"
+    assign_public_ip: yes
+    region: "us-east-1"
+    state: present
+    group_id: "sg-02f9283bb66f4a8a9"
+    aws_access_key: "AKIAWGOYPXXXDPTOZSIJ"
+    aws_secret_key: "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"
+  register: worker2
+- debug:
+    var: worker2.instances[0].public_ip
+
+- name: "Dynamically updating the inventory"
+  blockinfile:
+    path: /ip.txt
+    block: |
+      [ec2-master]
+      "{{ master.instances[0].public_ip }}"
+      [ec2-worker]
+      "{{ worker1.instances[0].public_ip }}"
+      "{{ worker2.instances[0].public_ip }}"
+
+

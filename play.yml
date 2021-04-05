@@ -1,0 +1,7 @@
+- hosts: ec2-master
+  roles:
+  - k8s_master
+
+- hosts: ec2-worker
+  roles:
+  - k8s_worker
