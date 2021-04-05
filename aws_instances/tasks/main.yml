@@ -15,8 +15,8 @@
     region: "us-east-1"
     state: present
     group_id: "sg-02f9283bb66f4a8a9"
-    aws_access_key: "AKIAWGOYPXXXDPTOZSIJ"
-    aws_secret_key: "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"
+    aws_access_key: "<< access_key >>"
+    aws_secret_key: "<< secret_key >>"
   register: master
 - debug:
     var: master.instances[0].public_ip
@@ -35,8 +35,8 @@
     region: "us-east-1"
     state: present
     group_id: "sg-02f9283bb66f4a8a9"
-    aws_access_key: "AKIAWGOYPXXXDPTOZSIJ"
-    aws_secret_key: "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"
+    aws_access_key: "<< access_key >>"
+    aws_secret_key: "<< secret_key >>"
   register: worker1
 - debug:
     var: worker1.instances[0].public_ip
@@ -55,8 +55,8 @@
     region: "us-east-1"
     state: present
     group_id: "sg-02f9283bb66f4a8a9"
-    aws_access_key: "AKIAWGOYPXXXDPTOZSIJ"
-    aws_secret_key: "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"
+    aws_access_key: "<< access_key >>"
+    aws_secret_key: "<< secret_key >>"
   register: worker2
 - debug:
     var: worker2.instances[0].public_ip
