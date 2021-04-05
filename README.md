@@ -28,3 +28,10 @@ Here, we need to give the path where all the roles are present. In my case I hav
 
 ### To run the script
 `ansible-playbook play.yml`
+
+### Connect worker nodes to master
+After the scripts have been run, we need to connect the workers to the master by generating the token in master and providing the token to the workers
+We can generate the token by the command `kubeadm token create --print-join-command`
+This command will print the token in the command line. All we need to do is mannually paste the token in the two worker nodes.
+We can check by running `kubectl get nodes` in the master node.
+That's all. Our multi node kubernetes cluster has been set over AWS.
