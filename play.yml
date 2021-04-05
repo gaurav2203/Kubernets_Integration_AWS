@@ -1,6 +1,6 @@
 - hosts: localhost
   roles: 
-  - aws-instance
+  - aws-instances
 - hosts: ec2-master
   roles:
   - k8s_master
